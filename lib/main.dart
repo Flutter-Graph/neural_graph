@@ -19,26 +19,52 @@ import 'package:neural_graph/rtc/data_channel.dart';
 import 'package:neural_graph/widgets/gesture_listener.dart';
 import 'package:neural_graph/widgets/resizable.dart';
 import 'package:neural_graph/widgets/scrollable.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 final RouteObserver<ModalRoute> routeObserver = RouteObserver<ModalRoute>();
 
-final theme = ThemeData(
-  primaryColor: Colors.blue[900],
-  toggleableActiveColor: Colors.blue[900],
-  visualDensity: VisualDensity.adaptivePlatformDensity,
-  inputDecorationTheme: const InputDecorationTheme(
-    isDense: true,
-    border: OutlineInputBorder(),
-    errorStyle: TextStyle(height: 0),
-    contentPadding: EdgeInsets.only(top: 7, bottom: 7, left: 10, right: 10),
-    labelStyle: TextStyle(fontSize: 18),
-  ),
-);
+ThemeData get theme {
+  return ThemeData(
+    primaryColor: Colors.blue[900],
+    toggleableActiveColor: Colors.blue[900],
+    visualDensity: VisualDensity.adaptivePlatformDensity,
+    inputDecorationTheme: const InputDecorationTheme(
+      isDense: true,
+      border: OutlineInputBorder(),
+      errorStyle: TextStyle(height: 0),
+      contentPadding: EdgeInsets.only(top: 7, bottom: 7, left: 10, right: 10),
+      labelStyle: TextStyle(fontSize: 18),
+    ),
+    textTheme: GoogleFonts.nunitoSansTextTheme(),
+    // inputDecorationTheme: const InputDecorationTheme(
+    //   isDense: true,
+    //   filled: true,
+    //   contentPadding: EdgeInsets.only(top: 7, left: 7, right: 7, bottom: 8),
+    //   labelStyle: TextStyle(height: 1),
+    // ),
+    tooltipTheme: const TooltipThemeData(
+      textStyle: TextStyle(fontSize: 14, color: Colors.white),
+      padding: EdgeInsets.only(left: 8, right: 8, bottom: 8, top: 5),
+    ),
+  );
+}
 
 void main() {
+  setPathUrlStrategy();
+  LicenseRegistry.addLicense(() async* {
+    final licenseCousine =
+        await rootBundle.loadString('google_fonts/LICENSE.txt');
+    final licenseNunitoSans =
+        await rootBundle.loadString('google_fonts/OFL.txt');
+
+    yield LicenseEntryWithLineBreaks(['google_fonts'], licenseCousine);
+    yield LicenseEntryWithLineBreaks(['google_fonts'], licenseNunitoSans);
+  });
+  
   GetIt.instance.registerSingleton(RootStore());
   mainContext.config = mainContext.config.clone(
     writePolicy: ReactiveWritePolicy.never,
+    disableErrorBoundaries: true,
   );
   runApp(GlobalKeyboardListener.wrapper(child: MyApp()));
 }
@@ -85,8 +111,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
+  const MyHomePage({Key? key, this.title}) : super(key: key);
+  final String? title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -98,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(title: Text(widget.title!)),
       body: Row(
         children: [
           const Resizable(
@@ -143,7 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class CodeGenerated extends HookWidget {
   const CodeGenerated({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -159,18 +185,19 @@ class CodeGenerated extends HookWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton.icon(
+                style: TextButton.styleFrom(padding: const EdgeInsets.all(14)),
                 icon: const Icon(Icons.file_present),
                 label: const Text("File"),
                 onPressed: () async {
                   if (kIsWeb) {
                     final handles =
-                        await FileSystem.instance.showOpenFilePicker();
+                        await FileSystem.instance!.showOpenFilePicker();
                     final handle = handles[0];
 
                     // final file = await handle.getFile();
                     // final contents = await readFileAsText(file);
 
-                    final v = await FileSystem.instance.verifyPermission(
+                    final v = await FileSystem.instance!.verifyPermission(
                       handle,
                       mode: FileSystemPermissionMode.readwrite,
                     );
@@ -244,7 +271,7 @@ class CodeGenerated extends HookWidget {
 }
 
 class PropertiesView extends HookWidget {
-  const PropertiesView({Key key}) : super(key: key);
+  const PropertiesView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext ctx) {
     final selectedGraph = useRoot().selectedNetwork.graph;
@@ -279,8 +306,8 @@ class PropertiesView extends HookWidget {
 
 class NodePropertiesView extends HookWidget {
   const NodePropertiesView({
-    Key key,
-    @required this.selectedGraph,
+    Key? key,
+    required this.selectedGraph,
   }) : super(key: key);
 
   final Graph<Layer> selectedGraph;
@@ -288,7 +315,7 @@ class NodePropertiesView extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final contoller = useTextEditingController(
-      text: selectedGraph.selectedNode.data.name,
+      text: selectedGraph.selectedNode!.data.name,
     );
 
     return Observer(
