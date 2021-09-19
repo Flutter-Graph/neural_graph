@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-import 'package:meta/meta.dart';
 import 'package:artemis/artemis.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
 import 'package:gql/ast.dart';
+import 'package:json_annotation/json_annotation.dart';
+
 part 'api.graphql.g.dart';
 
 @JsonSerializable(explicitToJson: true)
@@ -18,6 +18,7 @@ class Signal$MutationRoot extends JsonSerializable with EquatableMixin {
 
   @override
   List<Object?> get props => [signal];
+  @override
   Map<String, dynamic> toJson() => _$Signal$MutationRootToJson(this);
 }
 
@@ -36,6 +37,7 @@ class CreateSession$MutationRoot$UserSession extends JsonSerializable
 
   @override
   List<Object?> get props => [userId, token];
+  @override
   Map<String, dynamic> toJson() =>
       _$CreateSession$MutationRoot$UserSessionToJson(this);
 }
@@ -51,6 +53,7 @@ class CreateSession$MutationRoot extends JsonSerializable with EquatableMixin {
 
   @override
   List<Object?> get props => [createSessionId];
+  @override
   Map<String, dynamic> toJson() => _$CreateSession$MutationRootToJson(this);
 }
 
@@ -68,6 +71,7 @@ class Signals$SubscriptionRoot$Signal extends JsonSerializable
 
   @override
   List<Object?> get props => [payload, peerId];
+  @override
   Map<String, dynamic> toJson() =>
       _$Signals$SubscriptionRoot$SignalToJson(this);
 }
@@ -83,6 +87,7 @@ class Signals$SubscriptionRoot extends JsonSerializable with EquatableMixin {
 
   @override
   List<Object?> get props => [signals];
+  @override
   Map<String, dynamic> toJson() => _$Signals$SubscriptionRootToJson(this);
 }
 
@@ -97,6 +102,7 @@ class Room$SubscriptionRoot$Room extends JsonSerializable with EquatableMixin {
 
   @override
   List<Object?> get props => [users];
+  @override
   Map<String, dynamic> toJson() => _$Room$SubscriptionRoot$RoomToJson(this);
 }
 
@@ -111,6 +117,7 @@ class Room$SubscriptionRoot extends JsonSerializable with EquatableMixin {
 
   @override
   List<Object?> get props => [room];
+  @override
   Map<String, dynamic> toJson() => _$Room$SubscriptionRootToJson(this);
 }
 
@@ -137,7 +144,7 @@ class SignalMutation
   SignalMutation({this.variables});
 
   @override
-  final DocumentNode document = DocumentNode(definitions: [
+  final DocumentNode document = DocumentNode(definitions: const [
     OperationDefinitionNode(
         type: OperationType.mutation,
         name: NameNode(value: 'Signal'),
@@ -191,7 +198,7 @@ class CreateSessionMutation
   CreateSessionMutation();
 
   @override
-  final DocumentNode document = DocumentNode(definitions: [
+  final DocumentNode document = DocumentNode(definitions: const [
     OperationDefinitionNode(
         type: OperationType.mutation,
         name: NameNode(value: 'CreateSession'),
@@ -235,7 +242,7 @@ class SignalsSubscription
   SignalsSubscription();
 
   @override
-  final DocumentNode document = DocumentNode(definitions: [
+  final DocumentNode document = DocumentNode(definitions: const [
     OperationDefinitionNode(
         type: OperationType.subscription,
         name: NameNode(value: 'Signals'),
@@ -295,7 +302,7 @@ class RoomSubscription
   RoomSubscription({this.variables});
 
   @override
-  final DocumentNode document = DocumentNode(definitions: [
+  final DocumentNode document = DocumentNode(definitions: const [
     OperationDefinitionNode(
         type: OperationType.subscription,
         name: NameNode(value: 'Room'),

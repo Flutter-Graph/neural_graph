@@ -56,7 +56,7 @@ extension GetterSetterMap<K, V> on Map<K, V> {
 T? parseEnum<T>(String rawString, List<T> enumValues) {
   for (final value in enumValues) {
     final str = value.toString();
-    if (str == rawString || str.split(".")[1] == rawString) {
+    if (str == rawString || str.split('.')[1] == rawString) {
       return value;
     }
   }
@@ -64,18 +64,18 @@ T? parseEnum<T>(String rawString, List<T> enumValues) {
 }
 
 String toEnumString(Object enumValue) {
-  return enumValue.toString().split(".")[1];
+  return enumValue.toString().split('.')[1];
 }
 
 final _charsKey =
-    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split("");
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
 
 extension GenerateString on Random {
   String generateKey([int length = 7]) {
     return Iterable<int>.generate(length).map((_) {
       final _index = (this.nextDouble() * _charsKey.length).floor();
       return _charsKey[_index];
-    }).join("");
+    }).join();
   }
 }
 

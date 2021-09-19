@@ -119,7 +119,7 @@ class _MyAppState extends State<LoopBackSample> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   void _makeCall() async {
-    final mediaConstraints = <String, dynamic>{
+    final mediaConstraints = <String, Object?>{
       'audio': true,
       'video': {
         'mandatory': {
@@ -129,27 +129,27 @@ class _MyAppState extends State<LoopBackSample> {
           'minFrameRate': '30',
         },
         'facingMode': 'user',
-        'optional': [],
+        'optional': <Object?>[],
       }
     };
 
-    var configuration = <String, dynamic>{
+    final configuration = <String, Object?>{
       'iceServers': [
         {'url': 'stun:stun.l.google.com:19302'},
       ],
       'sdpSemantics': 'unified-plan'
     };
 
-    final offerSdpConstraints = <String, dynamic>{
+    final offerSdpConstraints = <String, Object?>{
       'mandatory': {
         'OfferToReceiveAudio': true,
         'OfferToReceiveVideo': true,
       },
-      'optional': [],
+      'optional': <Object?>[],
     };
 
-    final loopbackConstraints = <String, dynamic>{
-      'mandatory': {},
+    final loopbackConstraints = <String, Object?>{
+      'mandatory': <Object?>{},
       'optional': [
         {'DtlsSrtpKeyAgreement': false},
       ],
@@ -238,8 +238,9 @@ class _MyAppState extends State<LoopBackSample> {
           init:
               RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly));
       */
-      var description = await _peerConnection!.createOffer(offerSdpConstraints);
-      var sdp = description.sdp;
+      final description =
+          await _peerConnection!.createOffer(offerSdpConstraints);
+      final sdp = description.sdp;
       print('sdp = $sdp');
       await _peerConnection!.setLocalDescription(description);
       //change for loopback.
@@ -281,14 +282,14 @@ class _MyAppState extends State<LoopBackSample> {
   }
 
   void _sendDtmf() async {
-    var dtmfSender =
+    final dtmfSender =
         _peerConnection!.createDtmfSender(_localStream!.getAudioTracks()[0]);
     await dtmfSender.insertDTMF('123#');
   }
 
   @override
   Widget build(BuildContext context) {
-    var widgets = <Widget>[
+    final widgets = <Widget>[
       Expanded(
         child: RTCVideoView(_localRenderer, mirror: true),
       ),

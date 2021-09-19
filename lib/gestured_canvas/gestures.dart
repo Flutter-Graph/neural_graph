@@ -1,3 +1,4 @@
+// ignore_for_file: cast_nullable_to_non_nullable
 
 import 'package:flutter/material.dart';
 
@@ -119,8 +120,10 @@ class Gestures {
     if (onLongPressUp != null) GestureType.onLongPressUp,
     if (onLongPressEnd != null) GestureType.onLongPressEnd,
     if (onSecondaryLongPress != null) GestureType.onSecondaryLongPress,
-    if (onSecondaryLongPressStart != null) GestureType.onSecondaryLongPressStart,
-    if (onSecondaryLongPressMoveUpdate != null) GestureType.onSecondaryLongPressMoveUpdate,
+    if (onSecondaryLongPressStart != null)
+      GestureType.onSecondaryLongPressStart,
+    if (onSecondaryLongPressMoveUpdate != null)
+      GestureType.onSecondaryLongPressMoveUpdate,
     if (onSecondaryLongPressUp != null) GestureType.onSecondaryLongPressUp,
     if (onSecondaryLongPressEnd != null) GestureType.onSecondaryLongPressEnd,
     // if (onVerticalDragDown != null) GestureType.onVerticalDragDown,
@@ -147,7 +150,7 @@ class Gestures {
     if (onForcePressEnd != null) GestureType.onForcePressEnd,
   };
 
-  void consume<T>(RawGesture<T> rawGesture) {
+  void consume(RawGesture rawGesture) {
     switch (rawGesture.type) {
       case GestureType.onTapDown:
         onTapDown?.call(rawGesture.event as TapDownDetails);
@@ -198,7 +201,8 @@ class Gestures {
         onLongPressStart?.call(rawGesture.event as LongPressStartDetails);
         break;
       case GestureType.onLongPressMoveUpdate:
-        onLongPressMoveUpdate?.call(rawGesture.event as LongPressMoveUpdateDetails);
+        onLongPressMoveUpdate
+            ?.call(rawGesture.event as LongPressMoveUpdateDetails);
         break;
       case GestureType.onLongPressUp:
         onLongPressUp?.call();
@@ -210,10 +214,12 @@ class Gestures {
         onSecondaryLongPress?.call();
         break;
       case GestureType.onSecondaryLongPressStart:
-        onSecondaryLongPressStart?.call(rawGesture.event as LongPressStartDetails);
+        onSecondaryLongPressStart
+            ?.call(rawGesture.event as LongPressStartDetails);
         break;
       case GestureType.onSecondaryLongPressMoveUpdate:
-        onSecondaryLongPressMoveUpdate?.call(rawGesture.event as LongPressMoveUpdateDetails);
+        onSecondaryLongPressMoveUpdate
+            ?.call(rawGesture.event as LongPressMoveUpdateDetails);
         break;
       case GestureType.onSecondaryLongPressUp:
         onSecondaryLongPressUp?.call();
@@ -291,11 +297,9 @@ class Gestures {
   }
 }
 
-
-
-class RawGesture<T> {
+class RawGesture {
   final GestureType type;
-  final T event;
+  final Object? event;
 
   RawGesture(this.type, this.event);
 
@@ -411,7 +415,6 @@ class RawGesture<T> {
         return null;
     }
   }
-
 }
 
 enum GestureType {

@@ -8,6 +8,7 @@ import 'package:neural_graph/layers/convolutional_layer.dart';
 import 'package:neural_graph/layers/generator.dart';
 import 'package:neural_graph/layers/layers.dart';
 import 'package:neural_graph/layers/neural_network.dart';
+import 'package:neural_graph/tasks/tasks_store.dart';
 
 part 'root_store.g.dart';
 
@@ -22,12 +23,12 @@ abstract class _RootStore with Store {
   _RootStore() {
     final node1 = graph.createNode(
       const Offset(1420, 920),
-      (n) => Convolutional(n, name: "conv1"),
+      (n) => Convolutional(n, name: 'conv1'),
     );
 
     final node2 = graph.createNode(
       const Offset(20, 20),
-      (n) => Convolutional(n, name: "conv2"),
+      (n) => Convolutional(n, name: 'conv2'),
     );
 
     (node2.data as Convolutional)
@@ -53,6 +54,8 @@ abstract class _RootStore with Store {
       this.language,
     );
   }
+
+  final tasksStore = TasksStore();
 }
 
 RootStore useRoot() {

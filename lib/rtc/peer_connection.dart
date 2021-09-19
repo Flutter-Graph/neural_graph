@@ -12,17 +12,17 @@ class PeerConnectionState extends ChangeNotifier {
     required SingalProtocol<String> protocol,
     required this.peerId,
     required this.userId,
-    this.offerSdpConstraints = const <String, dynamic>{
+    this.offerSdpConstraints = const <String, Object?>{
       'mandatory': {
         'OfferToReceiveAudio': false,
         'OfferToReceiveVideo': false,
       },
-      'optional': [],
+      'optional': <Object?>[],
     },
     required this.isInitializer,
     RTCDataChannelInit? dataChannelConfig,
   }) : this.protocol = protocol.map<RTCSignal?>(
-          (s) => RTCSignal.fromJson(jsonDecode(s) as Map<String, dynamic>),
+          (s) => RTCSignal.fromJson(jsonDecode(s) as Map<String, Object?>),
           (s) => jsonEncode(s!.toJson()),
         ) {
     this._remoteSubscription =
@@ -47,14 +47,14 @@ class PeerConnectionState extends ChangeNotifier {
   }
 
   Future<void> _createConnection() async {
-    final configuration = <String, dynamic>{
+    final configuration = <String, Object?>{
       'iceServers': [
         {'url': 'stun:stun.l.google.com:19302'},
       ]
     };
 
-    final loopbackConstraints = <String, dynamic>{
-      'mandatory': {},
+    final loopbackConstraints = <String, Object?>{
+      'mandatory': <Object?, Object?>{},
       'optional': [
         {'DtlsSrtpKeyAgreement': true},
       ],
@@ -79,7 +79,7 @@ class PeerConnectionState extends ChangeNotifier {
   final String peerId;
   final String? userId;
 
-  bool _initialRenegotiation = false;
+  final bool _initialRenegotiation = false;
   final bool isInitializer;
   final connectionCompleter = Completer<RTCPeerConnection>();
   RTCPeerConnection? connection;
@@ -94,64 +94,64 @@ class PeerConnectionState extends ChangeNotifier {
 
   void _log(Object data) {
     final now = DateTime.now();
-    print(
-        "$userId | ${now.hour}:${now.minute}:${now.second}:${now.millisecond} | $data");
+    print('$userId | ${now.hour}:${now.minute}:'
+        '${now.second}:${now.millisecond} | $data');
   }
 
   Future<void> _onSignal(RTCSignal? signal) async {
-    _log("_onSignal ${signal!.toJson()}");
+    _log('_onSignal ${signal!.toJson()}');
     try {
       await connectionCompleter.future;
-      signal.when(
+      await signal.when(
         answer: (answer) async {
           await this
               .connection!
-              .setRemoteDescription(RTCSessionDescription(answer, "answer"));
+              .setRemoteDescription(RTCSessionDescription(answer, 'answer'));
         },
         offer: (offer) async {
           await this.connection!.setRemoteDescription(
-                RTCSessionDescription(offer, "offer"),
+                RTCSessionDescription(offer, 'offer'),
               );
           final answer =
               await this.connection!.createAnswer(offerSdpConstraints);
           // this.sdp = answer.sdp;
           await this.connection!.setLocalDescription(answer);
 
-          this._sendSignal(RTCSignal.answer(answer.sdp));
+          await this._sendSignal(RTCSignal.answer(answer.sdp));
         },
         candidate: (candidate) async {
           await this.connection!.addCandidate(candidate);
         },
       );
     } catch (e, s) {
-      print("_onSignal error ${signal.toJson()} \n$e\n$s");
+      print('_onSignal error ${signal.toJson()} \n$e\n$s');
     }
   }
 
   void _onSignalingState(RTCSignalingState state) {
-    _log("RTCSignalingState $state");
+    _log('RTCSignalingState $state');
     notifyListeners();
   }
 
   void _onConnectionState(RTCPeerConnectionState state) {
-    _log("RTCPeerConnectionState $state");
+    _log('RTCPeerConnectionState $state');
     notifyListeners();
   }
 
   void _onIceGatheringState(RTCIceGatheringState state) {
-    _log("RTCIceGatheringState $state");
+    _log('RTCIceGatheringState $state');
     notifyListeners();
   }
 
   void _onIceConnectionState(RTCIceConnectionState state) {
-    _log("RTCIceConnectionState $state");
+    _log('RTCIceConnectionState $state');
     notifyListeners();
   }
 
   void _onIceCandidate(RTCIceCandidate candidate) {
-    _log('_onIceCandidate: ${candidate?.toMap()}');
+    _log('_onIceCandidate: ${candidate.toMap()}');
     // connection.addCandidate(candidate);
-    if (candidate == null) {
+    if (candidate.candidate == null) {
       print('onIceCandidate: complete!');
       return;
     }
@@ -172,7 +172,7 @@ class PeerConnectionState extends ChangeNotifier {
   }
 
   void _onDataChannelState(RTCDataChannelState? state) {
-    _log("RTCDataChannelState $state");
+    _log('RTCDataChannelState $state');
     notifyListeners();
   }
 
@@ -181,30 +181,30 @@ class PeerConnectionState extends ChangeNotifier {
     // this.sdp = description.sdp;
     await connection!.setLocalDescription(description);
 
-    _sendSignal(RTCSignal.offer(description.sdp));
+    await _sendSignal(RTCSignal.offer(description.sdp));
   }
 
   /// Send some sample messages and handle incoming messages.
   void _onDataChannel(RTCDataChannel _dataChannel) {
     if (dataChannelCompleter.isCompleted) return;
 
-    _log("_onDataChannel");
+    _log('_onDataChannel');
     this.dataChannel = _dataChannel;
     dataChannelCompleter.complete(dataChannel);
 
     _onDataChannelState(dataChannel!.state);
     dataChannel!.onDataChannelState = _onDataChannelState;
     dataChannel!.onMessage = (message) {
-      _log("messageStream");
-      _log("messageStream ${message.text}");
+      _log('messageStream');
+      _log('messageStream ${message.text}');
 
       if (message.type == MessageType.text) {
         final _payload = jsonDecode(message.text) as List;
-        _payload.forEach(
-          (p) => _messageStreamController.add(
+        for (final p in _payload) {
+          _messageStreamController.add(
             RtcMessage.fromJson(p as Map<String, dynamic>),
-          ),
-        );
+          );
+        }
       } else {
         // do something with message.binary
 
@@ -212,8 +212,8 @@ class PeerConnectionState extends ChangeNotifier {
     };
 
     dataChannel!.messageStream.listen((event) {
-      _log("messageStreamListen");
-      _log("messageStreamListen ${event.text}");
+      _log('messageStreamListen');
+      _log('messageStreamListen ${event.text}');
     });
 
     // messageStream = dataChannel.messageStream.expand().asBroadcastStream();
@@ -222,7 +222,7 @@ class PeerConnectionState extends ChangeNotifier {
   }
 
   Future<void> sendText(RtcMessage message) async {
-    _log("sendText ${message.toJson()}");
+    _log('sendText ${message.toJson()}');
     return sendTexts([message]);
   }
 
@@ -235,16 +235,19 @@ class PeerConnectionState extends ChangeNotifier {
         ),
       );
     } catch (e, s) {
-      print("sendTexts error $e\n$s");
+      print('sendTexts error $e\n$s');
     }
   }
 
   Future<void> close() async {
     protocol.dispose();
+    // ignore: unawaited_futures
     _remoteSubscription?.cancel();
+    // ignore: unawaited_futures
     dataChannel?.close();
+    // ignore: unawaited_futures
     connection?.close();
-    _messageStreamController.close();
+    await _messageStreamController.close();
   }
 }
 
@@ -259,19 +262,19 @@ class RtcMessage {
     required this.timestamp,
   });
 
-  static RtcMessage fromJson(Map<String, dynamic> map) {
+  static RtcMessage fromJson(Map<String, Object?> map) {
     return RtcMessage(
       text: map['text'] as String?,
       roomId: map['roomId'] as String?,
-      timestamp: DateTime.parse(map['timestamp'] as String),
+      timestamp: DateTime.parse(map['timestamp']! as String),
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, Object?> toJson() {
     return {
-      "text": text,
-      "roomId": roomId,
-      "timestamp": timestamp.toIso8601String(),
+      'text': text,
+      'roomId': roomId,
+      'timestamp': timestamp.toIso8601String(),
     };
   }
 }

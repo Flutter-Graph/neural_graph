@@ -4,44 +4,43 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:neural_graph/diagram/node.dart';
 import 'package:neural_graph/widgets/resizable.dart';
-import 'package:neural_graph/widgets/scrollable.dart';
 
 const _menuMap = {
   'Model': [
-    "Input",
-    "Output",
-    "Loss",
-    "Metric",
-    "Optimizer",
-    "Callback",
+    'Input',
+    'Output',
+    'Loss',
+    'Metric',
+    'Optimizer',
+    'Callback',
   ],
   'Layers': [
-    "Convolutional",
-    "Dense",
-    "Recurrent",
-    "Transformer",
-    "Dropout",
-    "Embedding",
-    "Normalization",
+    'Convolutional',
+    'Dense',
+    'Recurrent',
+    'Transformer',
+    'Dropout',
+    'Embedding',
+    'Normalization',
   ],
-  'Activations': ["Softmax", "Sigmoid", "Relu"],
-  "Slice / Shape": [
-    "Concat",
-    "Gather",
-    "Stack",
-    "Tile",
-    "Slice",
-    "Split",
-    "Reshape",
-    "Traspose",
+  'Activations': ['Softmax', 'Sigmoid', 'Relu'],
+  'Slice / Shape': [
+    'Concat',
+    'Gather',
+    'Stack',
+    'Tile',
+    'Slice',
+    'Split',
+    'Reshape',
+    'Traspose',
   ],
 };
 
 class LayersMenu extends HookWidget {
   const LayersMenu({Key? key}) : super(key: key);
   @override
-  Widget build(BuildContext ctx) {
-    final textTheme = Theme.of(ctx).textTheme;
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final searchTerm = useTextEditingController();
     useListenable(searchTerm);
 
@@ -52,38 +51,63 @@ class LayersMenu extends HookWidget {
           child: TextField(
             controller: searchTerm,
             decoration: InputDecoration(
-              suffixIcon: IconButton(
-                icon: searchTerm.text.isEmpty
-                    ? const Icon(Icons.search)
-                    : const Icon(Icons.close),
+              suffixIcon: TextButton(
                 onPressed: searchTerm.clear,
+                child: searchTerm.text.isEmpty
+                    ? const Icon(Icons.search, size: 22)
+                    : const Icon(Icons.close, size: 22),
               ),
+              suffixIconConstraints: BoxConstraints.tight(const Size(36, 36)),
+              contentPadding: (Theme.of(context)
+                      .inputDecorationTheme
+                      .contentPadding! as EdgeInsets)
+                  .copyWith(top: 10),
             ),
           ),
         ),
         Expanded(
-          child: Scrollbar(
-            thickness: 10,
-            isAlwaysShown: true,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Builder(
-                builder: (context) {
-                  final firstSection = _menuMap.keys.first;
-                  return ListView(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    shrinkWrap: true,
-                    children: _menuMap.entries.map((e) {
-                      return _ListSection(
-                        firstSection: firstSection,
-                        textTheme: textTheme,
-                        e: e,
-                      );
-                    }).toList(),
+          child: AnimatedBuilder(
+            animation: searchTerm,
+            builder: (context, _) {
+              final _search = searchTerm.text.toLowerCase();
+              final list = _menuMap.entries
+                  .map(
+                    (e) => MapEntry(
+                      e.key,
+                      e.value
+                          .where((k) => k.toLowerCase().contains(_search))
+                          .toList(),
+                    ),
+                  )
+                  .where(
+                    (e) =>
+                        e.key.toLowerCase().contains(_search) ||
+                        e.value.isNotEmpty,
                   );
-                },
-              ),
-            ),
+              if (list.isEmpty) {
+                return const Center(
+                  child: Text(
+                    'No matches for filter',
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              }
+
+              String? firstSection;
+              return ListView(
+                padding: const EdgeInsets.only(right: 16.0),
+                shrinkWrap: true,
+                children: list.map((e) {
+                  firstSection ??= e.key;
+                  return _ListSection(
+                    key: Key(e.key),
+                    firstSection: firstSection!,
+                    textTheme: textTheme,
+                    e: e,
+                  );
+                }).toList(),
+              );
+            },
           ),
         ),
       ],
@@ -110,7 +134,7 @@ class _ListSection extends HookWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Separator(
-          size: 20,
+          size: e.key == firstSection ? 6 : 20,
           color: e.key == firstSection ? Colors.transparent : Colors.black26,
         ),
         Row(
@@ -125,6 +149,7 @@ class _ListSection extends HookWidget {
               ),
             ),
             IconButton(
+              splashRadius: 24,
               icon: Icon(open.value
                   ? Icons.keyboard_arrow_up
                   : Icons.keyboard_arrow_down),
@@ -146,8 +171,9 @@ class _ListSection extends HookWidget {
             itemBuilder: (ctx, index) {
               final text = e.value[index];
               return Draggable<String>(
+                key: Key(text),
                 data: text,
-                dragAnchor: DragAnchor.pointer,
+                dragAnchorStrategy: pointerDragAnchorStrategy,
                 feedback: NodeContainer(
                   isSelected: true,
                   child: Center(

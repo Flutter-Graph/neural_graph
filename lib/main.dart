@@ -1,3 +1,4 @@
+import 'package:file_system_access/file_system_access.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,13 +10,13 @@ import 'package:mobx/mobx.dart';
 import 'package:neural_graph/common/extensions.dart';
 import 'package:neural_graph/diagram/graph.dart';
 import 'package:neural_graph/fields/button_select_field.dart';
-import 'package:neural_graph/file_system_access_chrome/file_system_access.dart';
 import 'package:neural_graph/graph_canvas/graph_canvas.dart';
 import 'package:neural_graph/layers/codegen_helper.dart';
 import 'package:neural_graph/layers/layers.dart';
 import 'package:neural_graph/layers_menu.dart';
 import 'package:neural_graph/root_store.dart';
 import 'package:neural_graph/rtc/data_channel.dart';
+import 'package:neural_graph/tasks/tasks_tab_view.dart';
 import 'package:neural_graph/widgets/gesture_listener.dart';
 import 'package:neural_graph/widgets/resizable.dart';
 import 'package:neural_graph/widgets/scrollable.dart';
@@ -46,6 +47,12 @@ ThemeData get theme {
       textStyle: TextStyle(fontSize: 14, color: Colors.white),
       padding: EdgeInsets.only(left: 8, right: 8, bottom: 5, top: 5),
     ),
+    scrollbarTheme: ScrollbarThemeData(
+      isAlwaysShown: true,
+      interactive: true,
+      thickness: MaterialStateProperty.all(9),
+      mainAxisMargin: 6,
+    ),
   );
 }
 
@@ -60,9 +67,9 @@ void main() {
     yield LicenseEntryWithLineBreaks(['google_fonts'], licenseCousine);
     yield LicenseEntryWithLineBreaks(['google_fonts'], licenseNunitoSans);
   });
-  
+
   GetIt.instance.registerSingleton(RootStore());
-  mainContext.config = mainContext.config.clone(
+  mainContext.config = ReactiveConfig(
     writePolicy: ReactiveWritePolicy.never,
     disableErrorBoundaries: true,
   );
@@ -78,28 +85,28 @@ class MyApp extends StatelessWidget {
       navigatorObservers: [routeObserver],
       onGenerateRoute: (settings) {
         print(settings);
-        if (settings.name == "/fam/m") {
-          return MaterialPageRoute(
+        if (settings.name == '/fam/m') {
+          return MaterialPageRoute<Object?>(
             builder: (context) => Scaffold(
               appBar: AppBar(),
               backgroundColor: Colors.white,
-              body: const Center(child: Text("/fam/m")),
+              body: const Center(child: Text('/fam/m')),
             ),
             settings: settings,
           );
         }
-        if (settings.name == "/fam") {
-          return MaterialPageRoute(
+        if (settings.name == '/fam') {
+          return MaterialPageRoute<Object?>(
             builder: (context) => Scaffold(
               appBar: AppBar(),
               backgroundColor: Colors.white,
-              body: const Center(child: Text("/fam")),
+              body: const Center(child: Text('/fam')),
             ),
             settings: settings,
           );
         }
-        if (settings.name == "/") {
-          return MaterialPageRoute(
+        if (settings.name == '/') {
+          return MaterialPageRoute<Object?>(
             builder: (context) => const MyHomePage(title: 'Neural Graph'),
             settings: settings,
           );
@@ -121,45 +128,83 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final root = RootStore.instance;
 
+  int index = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title!)),
-      body: Row(
+      appBar: AppBar(
+          title: Row(
         children: [
-          const Resizable(
-            defaultWidth: 210,
-            horizontal: ResizeHorizontal.right,
-            child: LayersMenu(),
-          ),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Expanded(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(
-                        child: Observer(builder: (context) {
-                          return GraphView(graph: root.selectedNetwork.graph);
-                        }),
-                      ),
-                      const Resizable(
-                        defaultWidth: 400,
-                        horizontal: ResizeHorizontal.left,
-                        child: CodeGenerated(),
-                      ),
-                    ],
-                  ),
-                ),
-                const Resizable(
-                  defaultHeight: 300,
-                  vertical: ResizeVertical.top,
-                  child: PropertiesView(),
-                )
-              ],
+          Text(widget.title!),
+          InkWell(
+            onTap: () {
+              setState(() {
+                index = 0;
+              });
+            },
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
+              child: const Text('Scheduler'),
             ),
+          ),
+          InkWell(
+            onTap: () {
+              setState(() {
+                index = 1;
+              });
+            },
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
+              child: const Text('Graph'),
+            ),
+          )
+        ],
+      )),
+      body: IndexedStack(
+        index: index,
+        children: [
+          const TasksTabView(),
+          Row(
+            children: [
+              const Resizable(
+                defaultWidth: 210,
+                horizontal: ResizeHorizontal.right,
+                child: LayersMenu(),
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Expanded(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: Observer(builder: (context) {
+                              return GraphView(
+                                  graph: root.selectedNetwork.graph);
+                            }),
+                          ),
+                          const Resizable(
+                            defaultWidth: 400,
+                            horizontal: ResizeHorizontal.left,
+                            child: CodeGenerated(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Resizable(
+                      defaultHeight: 300,
+                      vertical: ResizeVertical.top,
+                      child: PropertiesView(),
+                    )
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -187,17 +232,17 @@ class CodeGenerated extends HookWidget {
               TextButton.icon(
                 style: TextButton.styleFrom(padding: const EdgeInsets.all(14)),
                 icon: const Icon(Icons.file_present),
-                label: const Text("File"),
+                label: const Text('File'),
                 onPressed: () async {
                   if (kIsWeb) {
                     final handles =
-                        await FileSystem.instance!.showOpenFilePicker();
+                        await FileSystem.instance.showOpenFilePicker();
                     final handle = handles[0];
 
                     // final file = await handle.getFile();
                     // final contents = await readFileAsText(file);
 
-                    final v = await FileSystem.instance!.verifyPermission(
+                    final v = await FileSystem.instance.verifyPermission(
                       handle,
                       mode: FileSystemPermissionMode.readwrite,
                     );
@@ -222,14 +267,14 @@ class CodeGenerated extends HookWidget {
                     Clipboard.setData(ClipboardData(text: sourceCode));
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text("Source code copied"),
+                        content: const Text('Source code copied'),
                         behavior: SnackBarBehavior.floating,
                         width: 300,
                       ),
                     );
                   },
                   icon: const Icon(Icons.file_copy),
-                  label: const Text("Copy"),
+                  label: const Text('Copy'),
                 );
               }),
               Observer(builder: (context) {
@@ -250,16 +295,20 @@ class CodeGenerated extends HookWidget {
               ),
               child: MultiScrollable(
                 vertical: controller,
-                child: SingleChildScrollView(
-                  controller: controller,
-                  child: Observer(builder: (context) {
-                    final sourceCode = root.generatedSourceCode;
+                child: ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context)
+                      .copyWith(scrollbars: false),
+                  child: SingleChildScrollView(
+                    controller: controller,
+                    child: Observer(builder: (context) {
+                      final sourceCode = root.generatedSourceCode;
 
-                    return SelectableText(
-                      sourceCode,
-                      style: GoogleFonts.cousine(),
-                    );
-                  }),
+                      return SelectableText(
+                        sourceCode,
+                        style: GoogleFonts.cousine(fontSize: 13),
+                      );
+                    }),
+                  ),
                 ),
               ),
             ),
@@ -273,7 +322,7 @@ class CodeGenerated extends HookWidget {
 class PropertiesView extends HookWidget {
   const PropertiesView({Key? key}) : super(key: key);
   @override
-  Widget build(BuildContext ctx) {
+  Widget build(BuildContext context) {
     final selectedGraph = useRoot().selectedNetwork.graph;
 
     return Row(
@@ -289,9 +338,9 @@ class PropertiesView extends HookWidget {
           child: Observer(builder: (context) {
             final conn = selectedGraph.selectedConnection;
             if (conn == null) {
-              return const Text("No selected connection");
+              return const Text('No selected connection');
             }
-            return Text("${conn.fromData.name} -> ${conn.toData.name}");
+            return Text('${conn.fromData.name} -> ${conn.toData.name}');
           }),
         ),
         const Resizable(
@@ -322,7 +371,7 @@ class NodePropertiesView extends HookWidget {
       builder: (context) {
         final selectedNode = selectedGraph.selectedNode;
         if (selectedNode == null) {
-          return const Center(child: Text("No selected node"));
+          return const Center(child: Text('No selected node'));
         }
         if (contoller.text != selectedNode.data.name) {
           contoller.text = selectedNode.data.name;
@@ -353,14 +402,14 @@ class NodePropertiesView extends HookWidget {
                   child: TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     controller: contoller,
-                    decoration: const InputDecoration(hintText: "Name"),
+                    decoration: const InputDecoration(hintText: 'Name'),
                     onChanged: (value) {
                       if (!isRepeated(value)) {
                         selectedNode.data.setName(value);
                       }
                     },
                     validator: (value) =>
-                        selectedNode.data.name != value ? "" : null,
+                        selectedNode.data.name != value ? '' : null,
                   ),
                 ),
                 IconButton(

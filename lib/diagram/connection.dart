@@ -4,8 +4,8 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
-import 'package:neural_graph/diagram/node.dart';
 import 'package:neural_graph/common/extensions.dart';
+import 'package:neural_graph/diagram/node.dart';
 
 class Connection<NF extends NodeData, NT extends NodeData> {
   final Port<NF> from;
@@ -23,7 +23,7 @@ class Connection<NF extends NodeData, NT extends NodeData> {
     return null;
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, Object?> toJson() {
     return {};
   }
 }

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -14,40 +12,35 @@ class DefaultForm extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = useMemoized(() => ScrollController());
-    return Scrollbar(
-      isAlwaysShown: true,
-      controller: controller,
-      thickness: 10,
-      child: Padding(
-        padding: const EdgeInsets.only(right: 10.0),
-        child: Builder(
-          builder: (context) {
-            final theme = Theme.of(context);
-            return SingleChildScrollView(
-              controller: controller,
-              child: Theme(
-                data: theme.copyWith(
+    return Padding(
+      padding: const EdgeInsets.only(right: 10.0),
+      child: Builder(
+        builder: (context) {
+          final theme = Theme.of(context);
+          return SingleChildScrollView(
+            controller: controller,
+            child: Theme(
+              data: theme.copyWith(
                   // inputDecorationTheme: const InputDecorationTheme(
                   //   isDense: true,
                   //   // contentPadding: EdgeInsets.only(top: 3, bottom: 3, left: 10),
                   //   labelStyle: TextStyle(fontSize: 18),
                   // ),
-                ),
-                child: DefaultTextStyle(
-                  style: theme.textTheme.bodyText1!.copyWith(),
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: FocusTraversalGroup(
-                      child: Form(
-                        child: child,
-                      ),
+                  ),
+              child: DefaultTextStyle(
+                style: theme.textTheme.bodyText1!.copyWith(),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: FocusTraversalGroup(
+                    child: Form(
+                      child: child,
                     ),
                   ),
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -72,7 +65,7 @@ class DefaultFormTable extends StatelessWidget {
       ),
       columnWidths: const {
         0: IntrinsicColumnWidth(),
-        1: FixedColumnWidth(40),
+        1: FixedColumnWidth(30),
       },
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       children: children,
@@ -109,8 +102,7 @@ TableRow tableRow({
   String? description,
   Widget? field,
   double maxWidth = 250,
-  double? maxHeight,
-  double minHeight = 52,
+  double minHeight = 38,
 }) {
   return TableRow(
     children: [
@@ -121,17 +113,19 @@ TableRow tableRow({
       IconButton(
         onPressed: () {},
         tooltip: description,
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        icon: const Icon(Icons.info_outline),
+        splashRadius: 24,
+        icon: const Icon(Icons.info_outline, size: 18),
       ),
-      Align(
-        alignment: Alignment.centerLeft,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: SizedBox(
-            width: maxWidth,
-            height: max(minHeight, maxHeight ?? 0),
-            child: field,
+      SizedBox(
+        height: minHeight,
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: SizedBox(
+              width: maxWidth,
+              child: field,
+            ),
           ),
         ),
       ),

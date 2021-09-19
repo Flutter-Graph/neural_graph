@@ -67,7 +67,8 @@ class _MultiScrollableState extends State<MultiScrollable> with RouteAware {
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, box) {
-                    SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
+                    SchedulerBinding.instance!
+                        .addPostFrameCallback((timeStamp) {
                       if (innerWidth != box.maxWidth ||
                           innerHeight != box.maxHeight) {
                         setState(() {
@@ -124,7 +125,7 @@ class ButtonScrollbar extends HookWidget {
     final isPressedButton = useState(false);
     if (controller == null ||
         !controller!.hasClients ||
-        controller!.position?.viewportDimension == null ||
+        controller!.position.viewportDimension == null ||
         controller!.position.viewportDimension < maxSize!) {
       return const SizedBox(width: 0, height: 0);
     }

@@ -3,10 +3,10 @@ import 'dart:ui' as ui;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:neural_graph/diagram/graph.dart';
-import 'package:neural_graph/gestured_canvas/gestures.dart';
-import 'package:neural_graph/gestured_canvas/gestured_canvas.dart';
-import 'package:neural_graph/graph_canvas/adding_node_state.dart';
 import 'package:neural_graph/diagram/node.dart';
+import 'package:neural_graph/gestured_canvas/gestured_canvas.dart';
+import 'package:neural_graph/gestured_canvas/gestures.dart';
+import 'package:neural_graph/graph_canvas/adding_node_state.dart';
 
 class PartialConnectionsPainter extends CustomPainter {
   final AddingConnectionState addingConnectionState;
@@ -52,8 +52,12 @@ class ConnectionsPainter extends CustomPainter {
     required this.graph,
   }) {
     // mobx
-    graph.nodes.values.forEach((node) => node.data.ports.forEach(
-        (port) => port.connections.forEach((conn) => conn.innerPoints.length)));
+    for (final node in graph.nodes.values) {
+      for (final port in node.data.ports) {
+        // ignore: avoid_function_literals_in_foreach_calls
+        port.connections.forEach((conn) => conn.innerPoints.length);
+      }
+    }
   }
   static final _paint = Paint()
     ..color = Colors.black
@@ -128,7 +132,7 @@ class ConnectionsPainter extends CustomPainter {
             color: Colors.black,
             background: Paint()..color = Colors.white,
           ));
-          paragraphB.addText("[24, 24, 12]");
+          paragraphB.addText('[24, 24, 12]');
           final paragraph = paragraphB.build();
           paragraph.layout(const ui.ParagraphConstraints(width: 200));
 

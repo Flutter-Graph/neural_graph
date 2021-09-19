@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:neural_graph/graph_canvas/store_graph_canvas.dart';
-import 'package:neural_graph/root_store.dart';
-import 'package:neural_graph/widgets/scrollable.dart';
 
 class CustomScrollGestures extends HookWidget {
   const CustomScrollGestures({
@@ -37,7 +35,7 @@ class CustomScrollGestures extends HookWidget {
             final _prev = canvas.scale;
             canvas.onScale(d.scale * initScale.value);
             final _p2 = canvas.toCanvasOffset(prevPoint.value);
-            print("$_p $_p2");
+            print('$_p $_p2');
             final center = Offset(box.maxWidth / 2, box.maxHeight / 2);
             final fromCenter =
                 (prevPoint.value - center) * _prev / canvas.scale;
