@@ -9,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mobx/mobx.dart';
 import 'package:neural_graph/common/extensions.dart';
 import 'package:neural_graph/diagram/graph.dart';
-import 'package:neural_graph/fields/button_select_field.dart';
 import 'package:neural_graph/graph_canvas/graph_canvas.dart';
 import 'package:neural_graph/layers/codegen_helper.dart';
 import 'package:neural_graph/layers/layers.dart';
@@ -20,6 +19,8 @@ import 'package:neural_graph/tasks/tasks_tab_view.dart';
 import 'package:neural_graph/widgets/gesture_listener.dart';
 import 'package:neural_graph/widgets/resizable.dart';
 import 'package:neural_graph/widgets/scrollable.dart';
+import 'package:stack_portal/fields.dart';
+import 'package:stack_portal/stack_portal.dart';
 import 'package:url_strategy/url_strategy.dart';
 
 final RouteObserver<ModalRoute> routeObserver = RouteObserver<ModalRoute>();
@@ -48,7 +49,6 @@ ThemeData get theme {
       padding: EdgeInsets.only(left: 8, right: 8, bottom: 5, top: 5),
     ),
     scrollbarTheme: ScrollbarThemeData(
-      isAlwaysShown: true,
       interactive: true,
       thickness: MaterialStateProperty.all(9),
       mainAxisMargin: 6,
@@ -73,16 +73,25 @@ void main() {
     writePolicy: ReactiveWritePolicy.never,
     disableErrorBoundaries: true,
   );
-  runApp(GlobalKeyboardListener.wrapper(child: MyApp()));
+  runApp(
+    GlobalKeyboardListener.wrapper(
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Neural Graph',
       theme: theme,
       navigatorObservers: [routeObserver],
+      builder: (context, child) {
+        return GlobalStack(child: child!);
+      },
       onGenerateRoute: (settings) {
         print(settings);
         if (settings.name == '/fam/m') {
@@ -107,7 +116,9 @@ class MyApp extends StatelessWidget {
         }
         if (settings.name == '/') {
           return MaterialPageRoute<Object?>(
-            builder: (context) => const MyHomePage(title: 'Neural Graph'),
+            builder: (context) => const GlobalStack(
+              child: MyHomePage(title: 'Neural Graph'),
+            ),
             settings: settings,
           );
         }
@@ -128,7 +139,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final root = RootStore.instance;
 
-  int index = 0;
+  int index = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             }),
                           ),
                           const Resizable(
-                            defaultWidth: 400,
+                            defaultWidth: 450,
                             horizontal: ResizeHorizontal.left,
                             child: CodeGenerated(),
                           ),

@@ -18,7 +18,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ">=2.17.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -32,14 +32,15 @@ dependencies:
   flutter_mobx: ^2.0.0
 
   # Tools
-  flutter_hooks: ^0.18.0
+  flutter_hooks:
   freezed_annotation:
   uuid: ^3.0.0
   get_it: ^6.0.0
   intl: ^0.17.0
   logger: ^1.0.0
-  google_fonts: ^2.0.0
-  flutter_webrtc: ^0.6.0
+  google_fonts: ^3.0.0
+  flutter_webrtc: ^0.8.12
+  petitparser: ^5.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -55,28 +56,21 @@ dependencies:
     # path: ../file_system_access/
 
   artemis:
-    git:
-      url: https://github.com/glynskyi/artemis
-      ref: c769cb40a8ea0ab856da0c0e5fbdd8e368ed529b
   gql_websocket_link:
-    git:
-      url: https://github.com/gql-dart/gql
-      ref: ce1b68b814ddf8b1056e9bc6b9a1146c2cc25d18
-      path: ./links/gql_websocket_link
-  json_annotation:
+  json_annotation: ^4.6.0
   equatable:
   meta:
-  gql: ^0.13.0-nullsafety.2
+  gql: ^0.13.1
 
-dev_dependencies:  
+dev_dependencies:
   flutter_test:
     sdk: flutter
   test:
   # fvm flutter pub run build_runner watch --delete-conflicting-outputs
   build_runner:
-  json_serializable:
-  mobx_codegen: ^2.0.0-nullsafety.2
-  freezed:
+  json_serializable: ^6.3.1
+  mobx_codegen: ^2.0.0
+  freezed: 2.0.3+1
   lint: ^1.0.0
   integration_test:
 
@@ -95,6 +89,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - google_fonts/
+    - packages/file_system_access/assets/file_persistence.js
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see
